@@ -2,6 +2,10 @@
 // Vercel Serverless Function — runs on Node.js, never exposed to the client
 // OpenAI API key is read from Vercel Environment Variables (OPENAI_API_KEY)
 
+import OpenAI from "openai";
+
+const client = new OpenAI();
+
 // Build the prompt sent to GPT-4o mini
 function buildPrompt(rawText, mode) {
   const modeInstruction =
@@ -56,47 +60,26 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'rawText is required.' })
   }
 
-  // Read API key from environment — set this in Vercel dashboard or .env.local
-  const apiKey = process.env.OPENAI_API_KEY
-  if (!apiKey) {
-    console.error('OPENAI_API_KEY is not set.')
-    return res.status(500).json({ error: 'Server configuration error.' })
-  }
-
   const safeMode = mode === 'creative' ? 'creative' : 'structured'
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        temperature: safeMode === 'structured' ? 0.3 : 0.7,
-        max_tokens: 800,
-        messages: [
-          {
-            role: 'system',
-            content: 'You convert raw event data into simple structured poster content and clear social media captions. Always return valid JSON only, no markdown.'
-          },
-          {
-            role: 'user',
-            content: buildPrompt(rawText.trim(), safeMode)
-          }
-        ]
-      })
+    const response = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
+      temperature: safeMode === 'structured' ? 0.3 : 0.7,
+      max_tokens: 800,
+      messages: [
+        {
+          role: 'system',
+          content: 'You convert raw event data into simple structured poster content and clear social media captions. Always return valid JSON only, no markdown.'
+        },
+        {
+          role: 'user',
+          content: buildPrompt(rawText.trim(), safeMode)
+        }
+      ]
     })
 
-    if (!response.ok) {
-      const errBody = await response.text()
-      console.error('OpenAI error:', response.status, errBody)
-      return res.status(502).json({ error: 'OpenAI request failed. Please try again.' })
-    }
-
-    const data = await response.json()
-    const content = data?.choices?.[0]?.message?.content
+    const content = response.choices[0].message.content
 
     if (!content) {
       return res.status(502).json({ error: 'Empty response from OpenAI.' })
@@ -124,3 +107,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Internal server error.' })
   }
 }
+
