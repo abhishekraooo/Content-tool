@@ -1,0 +1,344 @@
+/* ─── Reset & Base ────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:          #f5f4f0;
+  --surface:     #ffffff;
+  --border:      #e0ddd6;
+  --border-dark: #c8c4bc;
+  --text:        #1a1916;
+  --text-mid:    #5a574f;
+  --text-light:  #9a9790;
+  --accent:      #1a1916;
+  --accent-fg:   #f5f4f0;
+  --green:       #2d6a4f;
+  --green-light: #d8f3dc;
+  --red:         #c1121f;
+  --red-light:   #ffe5e5;
+  --toggle-off:  #ccc9c0;
+  --toggle-on:   #1a1916;
+
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+
+  --radius: 4px;
+  --panel-pad: 24px;
+}
+
+html { font-size: 15px; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ─── App Layout ──────────────────────────────────────────────────────────── */
+.app {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 20px 48px;
+}
+
+.app-header {
+  padding: 36px 0 28px;
+  border-bottom: 2px solid var(--text);
+  margin-bottom: 28px;
+}
+
+.app-header h1 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.app-subtitle {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--text-light);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* ─── Panels Grid ─────────────────────────────────────────────────────────── */
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .panels { grid-template-columns: 1fr; }
+}
+
+/* ─── Panel Base ──────────────────────────────────────────────────────────── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--panel-pad);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-title {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--text-mid);
+}
+
+.panel-tag {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: var(--text-light);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 2px 7px;
+}
+
+/* ─── Input Panel ─────────────────────────────────────────────────────────── */
+.raw-input {
+  width: 100%;
+  resize: vertical;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.raw-input:focus      { border-color: var(--border-dark); }
+.raw-input::placeholder { color: var(--text-light); }
+.raw-input:disabled   { opacity: 0.6; cursor: not-allowed; }
+
+/* ─── Mode Toggle ─────────────────────────────────────────────────────────── */
+.mode-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.mode-label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-mid);
+}
+
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.toggle-off { background: var(--toggle-off); }
+.toggle-on  { background: var(--toggle-on); }
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s;
+  display: block;
+}
+
+.toggle-on .toggle-thumb { transform: translateX(18px); }
+.toggle:disabled          { opacity: 0.5; cursor: not-allowed; }
+
+.mode-hint {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  font-family: var(--font-mono);
+}
+
+/* ─── Error Box ───────────────────────────────────────────────────────────── */
+.error-box {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--red-light);
+  border: 1px solid var(--red);
+  border-radius: var(--radius);
+  font-size: 0.83rem;
+  color: var(--red);
+}
+
+/* ─── Generate Button ─────────────────────────────────────────────────────── */
+.btn-generate {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 11px 0;
+  background: var(--accent);
+  color: var(--accent-fg);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: opacity 0.15s;
+}
+
+.btn-generate:hover:not(:disabled) { opacity: 0.85; }
+.btn-generate:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.input-hint {
+  margin-top: 8px;
+  font-size: 0.72rem;
+  color: var(--text-light);
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+/* ─── Loading & Empty States ──────────────────────────────────────────────── */
+.loading-state,
+.empty-state {
+  padding: 32px 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-family: var(--font-mono);
+}
+
+/* ─── Poster Fields ───────────────────────────────────────────────────────── */
+.fields-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.field-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.field-row:last-child { border-bottom: none; }
+
+.field-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.field-label {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-light);
+  text-transform: uppercase;
+}
+
+.field-value {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.field-empty { color: var(--text-light); }
+
+/* ─── Caption Blocks ──────────────────────────────────────────────────────── */
+.captions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.caption-block {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.caption-block:last-child { border-bottom: none; }
+
+.caption-value {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ─── Copy Button ─────────────────────────────────────────────────────────── */
+.btn-copy {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  padding: 3px 9px;
+  border: 1px solid var(--border-dark);
+  border-radius: 2px;
+  background: var(--surface);
+  color: var(--text-mid);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s;
+}
+
+.btn-copy:hover:not(:disabled) { background: var(--bg); }
+
+.btn-copy-done {
+  background: var(--green-light) !important;
+  color: var(--green) !important;
+  border-color: var(--green) !important;
+}
+
+.btn-copy:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ─── Copy All Row ────────────────────────────────────────────────────────── */
+.copy-all-row {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.copy-all-row .btn-copy {
+  font-size: 0.75rem;
+  padding: 5px 14px;
+}
+
+/* ─── Footer ──────────────────────────────────────────────────────────────── */
+.app-footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text-light);
+  text-align: center;
+}
