@@ -9,11 +9,11 @@ const API_URL = '/api/generateContent'
 
 export default function App() {
   const [rawText, setRawText] = useState('')
-  const [mode, setMode]       = useState('structured') // 'structured' | 'creative'
+  const [mode, setMode] = useState('structured') // 'structured' | 'creative'
   const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState('')
-  const [poster, setPoster]   = useState(null)
-  const [media, setMedia]     = useState(null)
+  const [error, setError] = useState('')
+  const [poster, setPoster] = useState(null)
+  const [media, setMedia] = useState(null)
 
   async function handleGenerate() {
     if (!rawText.trim()) {
@@ -57,7 +57,7 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <h1>Content Generator</h1>
-        <p className="app-subtitle">College Content Team · Event to Post in seconds</p>
+        <p className="app-subtitle">Content Team · Event to Post in seconds</p>
       </header>
 
       <main className="panels">
