@@ -4,8 +4,28 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "source": "/api/share/:id",
+      "destination": "/api/share/[id]"
+    },
+    {
+      "source": "/api/generateContent",
+      "destination": "/api/generateContent"
+    },
+    {
+      "source": "/api/save",
+      "destination": "/api/save"
+    },
+    {
+      "source": "/api/explore",
+      "destination": "/api/explore"
+    },
+    {
+      "source": "/share/:id",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/explore",
+      "destination": "/index.html"
     }
   ]
 }

@@ -126,6 +126,35 @@ No configuration needed.
 
 **Add a new output field:** Add to the JSON format in `buildPrompt()`, then add to `fields` array in `PosterPanel.jsx` or `MediaPanel.jsx`
 
+---
+
+## Setting up Firebase Firestore
+
+Step 1 — Enable Firestore
+- Go to Firebase Console → your project → Firestore Database → Create database
+- Start in production mode, choose a region close to you
+
+Step 2 — Create a Service Account
+- Firebase Console → Project Settings → Service Accounts
+- Click "Generate new private key" → downloads a JSON file
+
+Step 3 — Add env vars
+From the downloaded JSON file, copy these three values 
+into .env.local (local) and Vercel Environment Variables (production):
+  FIREBASE_PROJECT_ID     → "project_id" field
+  FIREBASE_CLIENT_EMAIL   → "client_email" field  
+  FIREBASE_PRIVATE_KEY    → "private_key" field (the whole string including \n)
+
+Step 4 — Add Firestore index
+The explore query uses orderBy('savedAt') — Firestore will show a link 
+in the server logs the first time it runs to create the required index.
+Click that link and create it. Takes about 1 minute.
+
+Free tier limits (plenty for a college team):
+  50,000 reads/day
+  20,000 writes/day
+  1 GB storage
+
 **Change the model:** Edit `model: 'gpt-4o-mini'` in `api/generateContent.js`
 
 **Style changes:** All styles are in one file: `src/styles.css`
