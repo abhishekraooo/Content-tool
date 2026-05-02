@@ -45,19 +45,25 @@ export default function SharePage() {
 
   const posterFields = [
     { label: 'Title', value: poster?.title },
+    { label: 'Name(s)', value: poster?.names || poster?.members },
+    { label: 'Description', value: poster?.description },
     { label: 'Achievement', value: poster?.achievement },
-    { label: 'Team', value: poster?.teamName },
-    { label: 'Members', value: poster?.members },
-    { label: 'Location', value: poster?.location },
+    { label: 'Event', value: poster?.eventName },
+    { label: 'Date', value: poster?.eventDate },
+    { label: 'Venue', value: poster?.venue || poster?.location },
+    { label: 'Prize', value: poster?.prize },
+    { label: 'Project', value: poster?.projectName },
+    { label: 'Department', value: poster?.department },
+    { label: 'Institution', value: poster?.institution },
     { label: 'Highlight', value: poster?.highlightLine }
-  ];
+  ].filter(f => f.value && f.value.trim() !== '');
 
   const mediaFields = [
-    { label: 'Instagram / Facebook Caption', value: media?.instagramCaption },
-    { label: 'Twitter / LinkedIn (Short)', value: media?.shortCaption },
-    { label: 'Story Format', value: media?.storyCaption },
+    { label: 'Full Caption', value: media?.fullCaption || media?.instagramCaption },
+    { label: 'Short Caption', value: media?.shortCaption },
+    { label: 'Story Caption', value: media?.storyCaption },
     { label: 'Hashtags', value: media?.hashtags }
-  ];
+  ].filter(f => f.value && f.value.trim() !== '');
 
   return (
     <div className="app">

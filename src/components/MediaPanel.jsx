@@ -3,23 +3,28 @@
 
 import CopyButton from './CopyButton.jsx'
 
-export default function MediaPanel({ media, loading }) {
+export default function MediaPanel({ media, loading, niche }) {
   const sections = [
-    { key: 'instagramCaption', label: 'Instagram Caption' },
-    { key: 'shortCaption',     label: 'Short Caption' },
-    { key: 'storyCaption',     label: 'Story Caption' },
-    { key: 'hashtags',         label: 'Hashtags' },
+    { key: 'fullCaption',   label: 'Full Caption (ready to post)' },
+    { key: 'shortCaption',  label: 'Short Caption' },
+    { key: 'storyCaption',  label: 'Story Caption' },
+    { key: 'hashtags',      label: 'Hashtags' },
   ]
 
   const allText = media
     ? sections.map(s => `${s.label}:\n${media[s.key] ?? ''}`).join('\n\n')
     : ''
 
+  const displayNiche = niche ? niche.charAt(0).toUpperCase() + niche.slice(1) : null;
+
   return (
     <section className="panel panel-media">
       <div className="panel-header">
         <h2 className="panel-title">MEDIA CONTEXT</h2>
-        <span className="panel-tag">Output</span>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {displayNiche && <span className="mode-badge">{displayNiche}</span>}
+          <span className="panel-tag">Output</span>
+        </div>
       </div>
 
       {loading && (

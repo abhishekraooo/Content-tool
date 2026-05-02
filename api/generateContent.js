@@ -6,43 +6,128 @@ import { GoogleGenAI } from "@google/genai";
 import Groq from "groq-sdk";
 
 // Build the prompt sent to AI
-function buildPrompt(rawText, mode) {
-  const modeInstruction =
-    mode === 'structured'
-      ? 'Use clean, professional, predictable language. No flair.'
-      : 'Be slightly engaging and warm, but keep it simple and concise.'
+function buildPrompt(rawText, mode, outputType) {
+  const modeInstruction = mode === 'structured'
+    ? 'Use formal, professional, congratulatory language. Clean and predictable.'
+    : 'Use warm, slightly expressive language. Can use 1-2 relevant emojis for achievements (🏆🥈🥉). Still concise.'
+
+  let jsonFormat = '';
+
+  if (outputType === 'both') {
+    jsonFormat = `{
+  "poster": {
+    "title": "Short punchy title or highlight line (e.g. '1st Place at Robo Habba 2026')",
+    "names": "Full individual or member name(s)",
+    "description": "Complete detailed description with individual or members name, event details, achievement and every detail"
+  },
+  "media": {
+    "fullCaption": "Complete ready-to-post caption modelled closely on the examples above. Include all details — names, semester, event, date, prize, project if available. End with the highlight line.",
+    "shortCaption": "One punchy sentence for quick sharing",
+    "storyCaption": "2-3 lines for Instagram/WhatsApp story — punchy and visual",
+    "hashtags": "All hashtags space-separated"
+  },
+  "niche": "one of: placement | hackathon | technical | cultural | academic"
+}`;
+  } else if (outputType === 'poster') {
+    jsonFormat = `{
+  "poster": {
+    "title": "Short punchy title or highlight line (e.g. '1st Place at Robo Habba 2026')",
+    "names": "Full individual or member name(s)",
+    "description": "Complete detailed description with individual or members name, event details, achievement and every detail"
+  },
+  "niche": "one of: placement | hackathon | technical | cultural | academic"
+}`;
+  } else if (outputType === 'media') {
+    jsonFormat = `{
+  "media": {
+    "fullCaption": "Complete ready-to-post caption modelled closely on the examples above. Include all details — names, semester, event, date, prize, project if available. End with the highlight line.",
+    "shortCaption": "One punchy sentence for quick sharing",
+    "storyCaption": "2-3 lines for Instagram/WhatsApp story — punchy and visual",
+    "hashtags": "All hashtags space-separated"
+  },
+  "niche": "one of: placement | hackathon | technical | cultural | academic"
+}`;
+  }
 
   return `
-Extract information from the raw text below and generate poster content and social media captions.
+You generate achievement post content for the Department of Robotics & AI (RAI), 
+Bangalore Institute of Technology (BIT Bangalore).
 
-Raw text:
+Study these real examples from the team to understand tone, structure, and style:
+
+EXAMPLE 1 (Placement):
+"We are pleased to share that Tanishka Mahajan from the Department of Robotics & AI 
+has been successfully placed at Toyota as a Graduate Engineer Trainee.
+Wishing her great success and a promising career ahead.
+#Congratulations #ProudMoment #BITBangalore #DepartmentOfRAI #campusplacement"
+
+EXAMPLE 2 (Cultural - Music):
+"Congratulations to Team Diminished 7th!
+Secured 1st Prize with a cash award of ₹8000 at the Battle of Bands (24/04/26, Manthan Fest).
+A great reflection of their talent and teamwork—keep rocking!"
+
+EXAMPLE 3 (Cultural - Poetry):
+"Congratulations to Vishal Raj Kongi!
+Secured 2nd Prize with a cash award of ₹1000 in the Poetry Competition (25/04/26).
+A wonderful reflection of his creativity and passion."
+
+EXAMPLE 4 (Technical - Multiple wins):
+"Students of RAI DEPT, Shashwat Sahu and K. Prajwal Poojari (RAI, 6th Sem) excelled 
+at Robo Habba 2026, Acharya Institute of Technology.
+🏆 Winners – Robo Exhibition
+🥈 Runners-Up – Robo Triathlon
+For their Unconditional Learning Native AI with SynapticX-6X.
+A proud moment for the department."
+
+EXAMPLE 5 (Cultural - Film, detailed):
+"Proudly representing the Department of Robotics & Artificial Intelligence at Manthan 2026,
+Yeshwanth (4th sem) and Hardik Giri Goswami (6th sem) secured 1st Place in the Short Film 
+Competition, along with a cash prize of ₹3000.
+Their film Goodmann, written by Yeshwanth and co-directed by Yeshwanth and Hardik Giri Goswami, 
+beautifully portrays a heartfelt reunion between two best friends.
+A commendable achievement that reflects creativity and teamwork!"
+
+---
+
+Now process this raw input:
 """
 ${rawText}
 """
 
 Instructions:
 - ${modeInstruction}
-- Extract: team name, event/hackathon name, position/achievement, location, member names.
-- Generate all fields listed below.
-- Return ONLY a valid JSON object. No explanation, no markdown, no code fences.
+- Extract EVERY detail present in the raw text. Do not skip or generalise any field.
+- If event date is mentioned, always include it in the poster and captions.
+- If cash prize is mentioned, always include the exact amount with ₹ symbol.
+- If semester/year of students is mentioned, include it in brackets after their name.
+- If a project name or work title is mentioned, include it.
+- If multiple achievements are mentioned (e.g. winner of one + runner-up of another), 
+  list each separately using 🏆🥈🥉 in creative mode, or numbered list in structured mode.
+- Department name: always "Department of Robotics & AI" (short: "RAI Dept")
+- Institution: always "Bangalore Institute of Technology" (short: "BIT Bangalore")
+- Detect the niche from the content:
+    "placement"  → job placement, internship
+    "hackathon"  → coding, tech competition, hackathon
+    "technical"  → robotics, project expo, technical fest
+    "cultural"   → music, dance, film, art, poetry, drama, sports
+    "academic"   → paper presentation, quiz, debate
+
+Hashtag rules:
+- Always include: #BangaloreInstituteofTechnology #BITBangalore #DepartmentOfRAI
+- Add niche-specific tags:
+    placement  → #CampusPlacement #ProudMoment #Congratulations
+    hackathon  → #HackathonWinners #TechAchievement #Coding
+    technical  → #RoboCell #TechnicalFest #Innovation
+    cultural   → #Manthan (or actual event name) #CulturalFest #Talent
+    academic   → #AcademicExcellence #ProudMoment
+- Add event name as a hashtag (remove spaces, capitalise each word)
+- Total hashtags: 8-12
+- Format: space-separated, each starting with #, no commas
+
+Return ONLY a valid JSON object. No explanation, no markdown, no code fences.
 
 JSON format:
-{
-  "poster": {
-    "title": "Short punchy title for the poster (e.g., '1st Place Win!')",
-    "achievement": "Clear achievement statement (e.g., '1st Place at XYZ Hackathon')",
-    "teamName": "Team name",
-    "members": "Comma-separated member names",
-    "location": "City or venue",
-    "highlightLine": "1-2 line motivational or descriptive line for the poster"
-  },
-  "media": {
-    "instagramCaption": "Full Instagram caption with context and emotion (2-4 sentences)",
-    "shortCaption": "One punchy sentence for Twitter/LinkedIn",
-    "storyCaption": "Short 1-2 line caption for Instagram/WhatsApp story",
-    "hashtags": "8-10 relevant hashtags separated by spaces"
-  }
-}
+${jsonFormat}
 `.trim()
 }
 
@@ -52,7 +137,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed. Use POST.' })
   }
 
-  const { rawText, mode } = req.body
+  const { rawText, mode = 'structured', outputType = 'both' } = req.body
 
   // Basic validation
   if (!rawText || typeof rawText !== 'string' || !rawText.trim()) {
@@ -70,7 +155,7 @@ export default async function handler(req, res) {
 
   const safeMode = mode === 'creative' ? 'creative' : 'structured'
   const systemPrompt = 'You convert raw event data into simple structured poster content and clear social media captions. Always return valid JSON only, no markdown.';
-  const userPrompt = buildPrompt(rawText.trim(), safeMode);
+  const userPrompt = buildPrompt(rawText.trim(), safeMode, outputType);
   
   let content = null;
 
@@ -127,8 +212,14 @@ export default async function handler(req, res) {
     return res.status(502).json({ error: 'Could not parse model response. Try again.' })
   }
 
-  if (!parsed.poster || !parsed.media) {
-    return res.status(502).json({ error: 'Model returned unexpected structure.' })
+  if (outputType === 'both' && (!parsed.poster || !parsed.media)) {
+    return res.status(502).json({ error: 'Model returned unexpected structure (missing both poster and media).' })
+  }
+  if (outputType === 'poster' && !parsed.poster) {
+    return res.status(502).json({ error: 'Model returned unexpected structure (missing poster).' })
+  }
+  if (outputType === 'media' && !parsed.media) {
+    return res.status(502).json({ error: 'Model returned unexpected structure (missing media).' })
   }
 
   return res.status(200).json(parsed)

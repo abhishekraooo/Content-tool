@@ -14,11 +14,14 @@ export default function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname)
 
   const [rawText, setRawText] = useState('')
+  const [file, setFile] = useState(null)
   const [mode, setMode] = useState('structured') // 'structured' | 'creative'
+  const [outputType, setOutputType] = useState('both') // 'both' | 'poster' | 'media'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [poster, setPoster] = useState(null)
   const [media, setMedia] = useState(null)
+  const [niche, setNiche] = useState(null)
 
   const [saveId, setSaveId] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -32,8 +35,8 @@ export default function App() {
   }
 
   async function handleGenerate() {
-    if (!rawText.trim()) {
-      setError('Please enter some event details first.')
+    if (!rawText.trim() && !file) {
+      setError('Please enter some event details or attach a file.')
       return
     }
 
@@ -41,13 +44,32 @@ export default function App() {
     setError('')
     setPoster(null)
     setMedia(null)
+    setNiche(null)
     setSaveId(null)
 
     try {
+      let combinedText = rawText.trim()
+
+      if (file) {
+        try {
+          const { parseFile } = await import('./utils/fileParser.js')
+          const extractedText = await parseFile(file)
+          if (extractedText && extractedText.trim()) {
+            combinedText += '\n\n--- Extracted Details from Attachment ---\n' + extractedText.trim()
+          }
+        } catch (err) {
+          throw new Error('Failed to process the attached file: ' + err.message)
+        }
+      }
+
+      if (!combinedText.trim()) {
+        throw new Error('No readable text found in the input or attachment.')
+      }
+
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rawText: rawText.trim(), mode })
+        body: JSON.stringify({ rawText: combinedText, mode, outputType })
       })
 
       if (!res.ok) {
@@ -57,12 +79,16 @@ export default function App() {
 
       const data = await res.json()
 
-      if (!data.poster || !data.media) {
-        throw new Error('Unexpected response format from server.')
+      if ((outputType === 'both' || outputType === 'poster') && !data.poster) {
+        throw new Error('Unexpected response format from server (missing poster).')
+      }
+      if ((outputType === 'both' || outputType === 'media') && !data.media) {
+        throw new Error('Unexpected response format from server (missing media).')
       }
 
-      setPoster(data.poster)
-      setMedia(data.media)
+      if (data.poster) setPoster(data.poster)
+      if (data.media) setMedia(data.media)
+      setNiche(data.niche)
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.')
     } finally {
@@ -88,26 +114,36 @@ export default function App() {
     }
   }
 
+  // Determine grid template based on outputType
+  // For mobile, panels scale automatically due to media queries, but on desktop we adjust the columns.
+  const gridStyle = outputType === 'both' ? { gridTemplateColumns: '1fr 1fr 1fr' } : { gridTemplateColumns: '1fr 1fr' }
+
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>Content Generator</h1>
-        <p className="app-subtitle">Content Team · Event to Post in seconds</p>
+      <header className="app-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1>Content Generator</h1>
+          <p className="app-subtitle">Event to Post in seconds</p>
+        </div>
+        <button
+          onClick={() => setCurrentPath('/explore')}
+          style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            padding: '8px 16px',
+            borderRadius: 'var(--radius)',
+            color: 'var(--text)',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            fontFamily: 'var(--font-mono)',
+            transition: 'all 0.2s'
+          }}
+          onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--text-mid)'}
+          onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
+        >
+          Browse Saved &rarr;
+        </button>
       </header>
-
-      <main className="panels">
-        <InputPanel
-          rawText={rawText}
-          onTextChange={setRawText}
-          mode={mode}
-          onModeChange={setMode}
-          onGenerate={handleGenerate}
-          loading={loading}
-          error={error}
-        />
-        <PosterPanel poster={poster} loading={loading} />
-        <MediaPanel media={media} loading={loading} />
-      </main>
 
       <SaveBar
         poster={poster}
@@ -116,6 +152,28 @@ export default function App() {
         saving={saving}
         onSave={handleSave}
       />
+
+      <main className="panels" style={gridStyle}>
+        <InputPanel
+          rawText={rawText}
+          onTextChange={setRawText}
+          file={file}
+          onFileChange={setFile}
+          mode={mode}
+          onModeChange={setMode}
+          outputType={outputType}
+          onOutputTypeChange={setOutputType}
+          onGenerate={handleGenerate}
+          loading={loading}
+          error={error}
+        />
+        {(outputType === 'both' || outputType === 'poster') && (
+          <PosterPanel poster={poster} loading={loading} niche={niche} />
+        )}
+        {(outputType === 'both' || outputType === 'media') && (
+          <MediaPanel media={media} loading={loading} niche={niche} />
+        )}
+      </main>
 
       <footer className="app-footer">
         Built by Abhishek Rao

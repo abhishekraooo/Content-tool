@@ -20,7 +20,7 @@ export default function SaveBar({ poster, media, saveId, saving, onSave }) {
       {saveId && (
         <>
           <span className="save-link">{shareUrl}</span>
-          <CopyButton textToCopy={shareUrl} label="Copy Link" />
+          <CopyButton text={shareUrl} label="Copy Link" />
           <div className="save-hint">Anyone with this link can view it</div>
         </>
       )}

@@ -349,8 +349,7 @@ body {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-  padding: 20px 0;
-  border-top: 1px solid var(--border);
+  padding: 10px 0;
   margin-top: 8px;
 }
 .save-link {
