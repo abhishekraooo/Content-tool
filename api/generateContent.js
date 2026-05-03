@@ -56,7 +56,7 @@ Bangalore Institute of Technology (BIT Bangalore).
 Study these real examples from the team to understand tone, structure, and style:
 
 EXAMPLE 1 (Placement):
-"We are pleased to share that Tanishka Mahajan from the Department of Robotics & AI 
+"We are pleased to share that Alice Smith from the Department of Robotics & AI 
 has been successfully placed at Toyota as a Graduate Engineer Trainee.
 Wishing her great success and a promising career ahead.
 #Congratulations #ProudMoment #BITBangalore #DepartmentOfRAI #campusplacement"
@@ -67,12 +67,12 @@ Secured 1st Prize with a cash award of ₹8000 at the Battle of Bands (24/04/26,
 A great reflection of their talent and teamwork—keep rocking!"
 
 EXAMPLE 3 (Cultural - Poetry):
-"Congratulations to Vishal Raj Kongi!
+"Congratulations to John Doe!
 Secured 2nd Prize with a cash award of ₹1000 in the Poetry Competition (25/04/26).
 A wonderful reflection of his creativity and passion."
 
 EXAMPLE 4 (Technical - Multiple wins):
-"Students of RAI DEPT, Shashwat Sahu and K. Prajwal Poojari (RAI, 6th Sem) excelled 
+"Students of RAI DEPT, Michael Johnson and David Lee (RAI, 6th Sem) excelled 
 at Robo Habba 2026, Acharya Institute of Technology.
 🏆 Winners – Robo Exhibition
 🥈 Runners-Up – Robo Triathlon
@@ -81,9 +81,9 @@ A proud moment for the department."
 
 EXAMPLE 5 (Cultural - Film, detailed):
 "Proudly representing the Department of Robotics & Artificial Intelligence at Manthan 2026,
-Yeshwanth (4th sem) and Hardik Giri Goswami (6th sem) secured 1st Place in the Short Film 
+Emma (4th sem) and Oliver (6th sem) secured 1st Place in the Short Film 
 Competition, along with a cash prize of ₹3000.
-Their film Goodmann, written by Yeshwanth and co-directed by Yeshwanth and Hardik Giri Goswami, 
+Their film Goodmann, written by Emma and co-directed by Emma and Oliver, 
 beautifully portrays a heartfelt reunion between two best friends.
 A commendable achievement that reflects creativity and teamwork!"
 

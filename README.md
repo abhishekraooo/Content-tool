@@ -1,160 +1,60 @@
 # College Content Tool
 
-A minimal full-stack web app for college content teams.
-Input raw event details → get structured poster content + social media captions.
+A powerful, AI-driven content generation tool tailored for college departments and student clubs. It transforms raw event details or attached files (PDFs/Images) into structured poster content and engaging social media captions in seconds.
 
-**Stack:** React (Vite) · Vercel Serverless Functions · OpenAI GPT-4o mini
+## Features
 
----
+- **AI Content Generation**: Generates contextual poster highlights, Instagram/Facebook captions, short tweets, and relevant hashtags.
+- **Dual Providers**: Utilizes Google Gemini (`gemini-3-flash-preview`) as the primary AI engine with Groq (`llama-3.3-70b-versatile`) as a robust fallback.
+- **Local File Parsing**: Privacy-first file extraction. Upload brochures or event PDFs, and the app uses `pdfjs-dist` and `tesseract.js` to extract text locally on the client without sending files directly to third-party vision APIs.
+- **Dynamic Output Targeting**: Generate only Poster Context, only Media Context, or Both to save AI processing time and tokens.
+- **Save & Share Community**: Save generations anonymously to Firebase Firestore. Share specific posts via direct links, or browse all previous generations on the `/explore` page.
+- **Responsive & Minimal UI**: A clean, glassmorphism-inspired multi-column layout that gracefully collapses on mobile devices.
 
-## Project Structure
+## Tech Stack
 
-```
-college-content-tool/
-├── api/
-│   └── generateContent.js     ← Serverless function (runs on Vercel, calls OpenAI)
-├── src/
-│   ├── main.jsx               ← React entry point
-│   ├── App.jsx                ← Root component + fetch logic
-│   ├── styles.css             ← All styles
-│   └── components/
-│       ├── InputPanel.jsx     ← Panel 1: raw input + mode toggle
-│       ├── PosterPanel.jsx    ← Panel 2: poster fields
-│       ├── MediaPanel.jsx     ← Panel 3: social media captions
-│       └── CopyButton.jsx     ← Reusable copy-to-clipboard button
-├── index.html
-├── vite.config.js
-├── vercel.json                ← Vercel build config
-├── package.json
-├── .env.example               ← Copy to .env.local for local dev
-└── .gitignore
-```
+- **Frontend**: React (Vite)
+- **Backend API**: Vercel Serverless Functions (Node.js)
+- **AI Integration**: `@google/genai` (Gemini), `groq-sdk` (Llama 3.3)
+- **Database**: Firebase (Firestore via `firebase-admin`)
+- **File Parsing**: `tesseract.js` (Images), `pdfjs-dist` (PDFs)
 
----
+## Setup & Installation
 
-## Local Development
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/college-content-tool.git
+   cd college-content-tool
+   ```
 
-### 1. Install dependencies
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-```bash
-npm install
-```
+3. **Environment Variables:**
+   Create a `.env.local` file in the root directory and add the following keys:
+   ```env
+   # AI Providers
+   GEMINI_API_KEY=your_gemini_key
+   GROQ_API_KEY=your_groq_key
 
-### 2. Set up environment variable
+   # Firebase Admin SDK
+   FIREBASE_PROJECT_ID=your_project_id
+   FIREBASE_CLIENT_EMAIL=your_client_email
+   FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+   ```
 
-```bash
-cp .env.example .env.local
-# Edit .env.local and add your OpenAI API key
-```
+4. **Run the development server:**
+   Because this project uses Vercel Serverless Functions (`/api/*`), you must use the Vercel CLI to run it locally:
+   ```bash
+   npx vercel dev
+   ```
 
-### 3. Run locally
+## Contributing
 
-**Option A — Vercel CLI (recommended, runs API functions too)**
+Contributions are always welcome! Please open an issue or submit a pull request if you have ideas for new features, bug fixes, or improvements.
 
-```bash
-npm install -g vercel
-vercel dev
-```
+## License
 
-Open http://localhost:3000
-
-**Option B — Vite only (frontend only, API calls will fail)**
-
-```bash
-npm run dev
-```
-
----
-
-## Deploy to Vercel
-
-### Option A — Vercel CLI
-
-```bash
-vercel
-# Follow prompts to link/create project
-```
-
-Then add your environment variable:
-
-```bash
-vercel env add OPENAI_API_KEY
-# Paste your key when prompted, select all environments
-```
-
-Deploy to production:
-
-```bash
-vercel --prod
-```
-
-### Option B — Vercel Dashboard (easiest)
-
-1. Push this project to a GitHub repo
-2. Go to https://vercel.com/new → Import your repo
-3. Vercel auto-detects Vite — no config needed
-4. Go to **Project Settings → Environment Variables**
-5. Add `OPENAI_API_KEY` with your OpenAI key
-6. Click **Redeploy**
-
-Your app is live at `https://your-project.vercel.app`
-
----
-
-## How It Works
-
-```
-User types raw text
-       ↓
-React frontend (Vite, /src)
-       ↓  POST /api/generateContent
-Vercel Serverless Function (/api/generateContent.js)
-       ↓  reads OPENAI_API_KEY from env
-OpenAI API (gpt-4o-mini)
-       ↓  returns JSON
-Frontend renders Poster + Media panels
-```
-
-Vercel automatically routes any request to `/api/*` to the matching file in `/api/`.
-No configuration needed.
-
----
-
-## Customisation
-
-**Change the prompt:** Edit `buildPrompt()` in `api/generateContent.js`
-
-**Add a new output field:** Add to the JSON format in `buildPrompt()`, then add to `fields` array in `PosterPanel.jsx` or `MediaPanel.jsx`
-
----
-
-## Setting up Firebase Firestore
-
-Step 1 — Enable Firestore
-- Go to Firebase Console → your project → Firestore Database → Create database
-- Start in production mode, choose a region close to you
-
-Step 2 — Create a Service Account
-- Firebase Console → Project Settings → Service Accounts
-- Click "Generate new private key" → downloads a JSON file
-
-Step 3 — Add env vars
-From the downloaded JSON file, copy these three values 
-into .env.local (local) and Vercel Environment Variables (production):
-  FIREBASE_PROJECT_ID     → "project_id" field
-  FIREBASE_CLIENT_EMAIL   → "client_email" field  
-  FIREBASE_PRIVATE_KEY    → "private_key" field (the whole string including \n)
-
-Step 4 — Add Firestore index
-The explore query uses orderBy('savedAt') — Firestore will show a link 
-in the server logs the first time it runs to create the required index.
-Click that link and create it. Takes about 1 minute.
-
-Free tier limits (plenty for a college team):
-  50,000 reads/day
-  20,000 writes/day
-  1 GB storage
-
-**Change the model:** Edit `model: 'gpt-4o-mini'` in `api/generateContent.js`
-
-**Style changes:** All styles are in one file: `src/styles.css`
+This project is open-source and available under the [MIT License](LICENSE).
