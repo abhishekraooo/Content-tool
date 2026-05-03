@@ -94,7 +94,7 @@ export default function SharePage() {
               <div key={i} className="field-row">
                 <div className="field-meta">
                   <span className="field-label">{f.label}</span>
-                  <CopyButton textToCopy={f.value} />
+                  <CopyButton text={f.value} />
                 </div>
                 <div className={f.value ? "field-value" : "field-value field-empty"}>
                   {f.value || 'None'}
@@ -113,7 +113,7 @@ export default function SharePage() {
               <div key={i} className="caption-block">
                 <div className="field-meta">
                   <span className="field-label">{f.label}</span>
-                  <CopyButton textToCopy={f.value} />
+                  <CopyButton text={f.value} />
                 </div>
                 <div className={f.value ? "caption-value" : "caption-value field-empty"}>
                   {f.value || 'None'}
