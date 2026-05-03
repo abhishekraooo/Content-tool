@@ -1,4 +1,4 @@
-# College Content Tool
+# Content Tool
 
 A powerful, AI-driven content generation tool tailored for college departments and student clubs. It transforms raw event details or attached files (PDFs/Images) into structured poster content and engaging social media captions in seconds.
 
@@ -23,8 +23,8 @@ A powerful, AI-driven content generation tool tailored for college departments a
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/college-content-tool.git
-   cd college-content-tool
+   git clone https://github.com/yourusername/content-tool.git
+   cd content-tool
    ```
 
 2. **Install dependencies:**
